@@ -15,6 +15,7 @@ class CatRentalRequest < ActiveRecord::Base
   validates :cat_id, :start_date, :end_date, :status, presence: true
   validates :status, inclusion: { in: ['PENDING', 'APPROVED', 'DENIED'] }
   validate :overlapping_approved_requests
+  validate :start_before_end
 
   belongs_to(
     :cat,
@@ -24,12 +25,11 @@ class CatRentalRequest < ActiveRecord::Base
   )
 
   def approve!
+    raise "not pending" unless self.status == "PENDING"
     transaction do
       self.status = "APPROVED"
-      save
-      overlapping_pending_requests.each do |request|
-        request.deny!
-      end
+      save!
+      overlapping_pending_requests.each{ |request| request.deny! }
     end
   end
 
@@ -57,6 +57,12 @@ class CatRentalRequest < ActiveRecord::Base
 
   def overlapping_pending_requests
     overlapping_requests.select { |request| request.status == "PENDING"}
+  end
+
+  def start_before_end
+    return if (!start_date.nil? && !end_date.nil?) && start_date < end_date 
+    errors[:start_date] << 'Must come before end date'
+    errors[:end_date] << 'Must come after start date'
   end
 
 end

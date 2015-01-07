@@ -1,6 +1,7 @@
 class CatRentalRequestsController < ApplicationController
   def new
     @all_cats = Cat.all
+    @request = CatRentalRequest.new
     render :new
   end
 
@@ -9,6 +10,7 @@ class CatRentalRequestsController < ApplicationController
     if @request.save
       redirect_to cat_url(@request.cat_id)
     else
+      @all_cats = Cat.all
       render :new
     end
   end

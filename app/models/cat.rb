@@ -13,8 +13,12 @@
 #
 
 class Cat < ActiveRecord::Base
+  include ActionView::Helpers::DateHelper
+
+  CAT_COLORS = ["black", "white", "orange"]
+
   validates :birth_date, :color, :name, :sex, presence: true
-  validates :color, inclusion: { in: ["black", "white", "orange"],
+  validates :color, inclusion: { in: CAT_COLORS,
     message: "cat can only be black, white, or orange" }
   validates :sex, inclusion: { in: ["m", "f"],
     message: "cat has to be male or female" }
@@ -28,6 +32,6 @@ class Cat < ActiveRecord::Base
   )
 
   def age
-    ((Time.now - birth_date.to_time)/(3600*24*365)).round(2)
+    time_ago_in_words(birth_date)
   end
 end
