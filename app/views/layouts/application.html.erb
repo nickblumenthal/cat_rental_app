@@ -5,7 +5,12 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-
+<% if current_user.nil? %>
+  <%= button_to 'Login', new_session_url, method: :get %>
+<% else %>
+  <%= current_user.user_name %>
+  <%= button_to 'Logout', session_url, method: :delete %>
+<% end %>
 <%= yield %>
 
 </body>

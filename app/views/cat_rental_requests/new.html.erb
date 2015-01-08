@@ -12,4 +12,7 @@
   <input type="date" name="cat_rental_request[start_date]" value = "<%= @request.start_date %>">
   <input type="date" name="cat_rental_request[end_date]" value = "<%= @request.end_date %>">
   <input type="submit" value="Submit Request">
+  <input type="hidden"
+  name="authenticity_token"
+  value="<%= form_authenticity_token %>">
 </form>

@@ -12,15 +12,30 @@
 #
 
 class CatRentalRequest < ActiveRecord::Base
-  validates :cat_id, :start_date, :end_date, :status, presence: true
+  validates :cat_id, :start_date, :end_date, :status, :user_id, presence: true
   validates :status, inclusion: { in: ['PENDING', 'APPROVED', 'DENIED'] }
   validate :overlapping_approved_requests
   validate :start_before_end
+
+
 
   belongs_to(
     :cat,
     class_name: "Cat",
     foreign_key: :cat_id,
+    primary_key: :id
+  )
+
+  has_one(
+    :owner,
+    through: :cat,
+    source: :owner
+  )
+
+  belongs_to(
+    :requester,
+    class_name: 'User',
+    foreign_key: :user_id,
     primary_key: :id
   )
 
@@ -60,7 +75,7 @@ class CatRentalRequest < ActiveRecord::Base
   end
 
   def start_before_end
-    return if (!start_date.nil? && !end_date.nil?) && start_date < end_date 
+    return if (!start_date.nil? && !end_date.nil?) && start_date < end_date
     errors[:start_date] << 'Must come before end date'
     errors[:end_date] << 'Must come after start date'
   end
